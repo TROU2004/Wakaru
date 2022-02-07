@@ -96,6 +96,7 @@ namespace Wakaru
             {
                 return Task.Factory.StartNew(() =>
                 {
+                    MainWindow.ClearLog();
                     MainWindow.AddLog("上课: " + DateTime.Now.ToString());
                     MainWindow.NextTime = DateTime.Now.AddMinutes(35);
                     MainWindow.ChangeStatus(Status.IN_CLASS);
@@ -110,12 +111,14 @@ namespace Wakaru
             {
                 return Task.Factory.StartNew(() =>
                 {
-                    MainWindow.ClearLog();
+                    //非常Dirty的实现，凑合用
                     MainWindow.AddLog("下课: " + DateTime.Now.ToString());
                     //课间休息
                     MainWindow.NextTime = DateTime.Now.AddMinutes(10);
                     //中午休息
                     if (DateTime.Now.Hour == 11) MainWindow.NextTime = DateTime.Now.AddMinutes(110);
+                    //下午大课间
+                    if (DateTime.Now.Hour == 14) MainWindow.NextTime = DateTime.Now.AddMinutes(30);
                     //晚上休息
                     if (DateTime.Now.Hour == 16) MainWindow.NextTime = DateTime.Now.AddMinutes(90);
                     MainWindow.ChangeStatus(Status.CLASS_OVER);
