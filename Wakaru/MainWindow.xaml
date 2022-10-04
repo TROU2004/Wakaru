@@ -12,7 +12,7 @@
                 <StackPanel Orientation="Horizontal">
                     <ToggleButton Style="{DynamicResource MaterialDesignHamburgerToggleButton}" />
                     <TextBlock FontSize="18" VerticalAlignment="Center" Margin="16 0 0 0">
-                    Wakaru v20220207 - 通化一中腾讯会议打铃系统
+                    Wakaru v20221005 - 通化一中腾讯会议打铃系统
                     </TextBlock>
                 </StackPanel>
                 <Button HorizontalAlignment="Right" Foreground="White" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click">
@@ -74,7 +74,7 @@
                             <StackPanel Margin="5">
                                 <TextBlock FontSize="14">开源</TextBlock>
                                 <TextBlock TextWrapping="Wrap" FontSize="12">已于Github开源, 遵从CC BY 4.0协议</TextBlock>
-                                <TextBlock Foreground="Gray" Style="{StaticResource MaterialDesignHelperTextBlock}" TextWrapping="Wrap" FontSize="11">http://github.com/TROU2004/Wakaru</TextBlock>
+                                <TextBlock Foreground="Gray" Style="{StaticResource MaterialDesignHelperTextBlock}" TextWrapping="Wrap" FontSize="11">http://github.com/TrueRou/Wakaru</TextBlock>
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Margin="10" Orientation="Horizontal">
@@ -87,7 +87,7 @@
                             <StackPanel Margin="5">
                                 <TextBlock FontSize="14">开发者</TextBlock>
                                 <TextBlock TextWrapping="Wrap" FontSize="12">2020级6班 兔肉</TextBlock>
-                                <TextBlock Foreground="Gray" Style="{StaticResource MaterialDesignHelperTextBlock}" TextWrapping="Wrap" FontSize="11">http://github.com/TROU2004</TextBlock>
+                                <TextBlock Foreground="Gray" Style="{StaticResource MaterialDesignHelperTextBlock}" TextWrapping="Wrap" FontSize="11">http://github.com/TrueRou</TextBlock>
                             </StackPanel>
                         </StackPanel>
                     </Grid>

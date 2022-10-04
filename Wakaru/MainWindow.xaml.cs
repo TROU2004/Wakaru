@@ -31,7 +31,7 @@ namespace Wakaru
             Instance = this;
             AddLog("Wakaru正在启动...");
             LoadClasses();
-            ChangeStatus(Status.CLASS_OVER);
+            ChangeStatus(Status.WAIT_FOR_CLASS);
             DispatcherTimer dispatcherTimer = new()
             {
                 Interval = new TimeSpan(0, 0, 0, 1, 0)
@@ -68,15 +68,10 @@ namespace Wakaru
             Instance.Dispatcher.BeginInvoke(new Action(() => {
                 Instance.StateNowText.Text = "当前状态: " + GetStatusString(status);
                 Instance.StateNextText.Text = "下一状态: " + GetStatusString(status + 1);
-                if (status == Status.IN_CLASS || status == Status.AFTER_RESTING)
+                if (status == Status.IN_CLASS)
                 {
                     Instance.ClassStateText.Text = "上课中";
                     Instance.IconPic.Kind = MaterialDesignThemes.Wpf.PackIconKind.Book;
-                }
-                if (status == Status.RESTING)
-                {
-                    Instance.ClassStateText.Text = "休息中";
-                    Instance.IconPic.Kind = MaterialDesignThemes.Wpf.PackIconKind.Eye;
                 }
                 if (status == Status.CLASS_OVER)
                 {
@@ -117,17 +112,16 @@ namespace Wakaru
 
         private static string GetStatusString(Status status)
         {
-            if (status == Status.IN_CLASS) return "上半节课";
-            if (status == Status.RESTING) return "课中休息";
-            if (status == Status.AFTER_RESTING) return "下半节课";
+            if (status == Status.IN_CLASS) return "上课";
             if (status == Status.CLASS_OVER) return "下课";
-            if (status == Status.WAIT_FOR_CLASS) return "上课";
+            if (status == Status.WAIT_FOR_CLASS) return "等待上课";
+            if (status >= Status.WAIT_FOR_CLASS) return "上课";
             return "未知";
         }
     }
 
     public enum Status
     {
-        IN_CLASS, RESTING, AFTER_RESTING, CLASS_OVER, WAIT_FOR_CLASS
+        IN_CLASS, CLASS_OVER, WAIT_FOR_CLASS
     }
 }

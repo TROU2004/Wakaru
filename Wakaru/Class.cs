@@ -13,37 +13,32 @@ namespace Wakaru
     {
         readonly static string CLASS_BEGIN_RING_PATH = Path.Combine(Directory.GetCurrentDirectory(), "begin.wav");
         readonly static string CLASS_OVER_RING_PATH = Path.Combine(Directory.GetCurrentDirectory(), "over.wav");
-        readonly static string CLASS_REST_BEGIN_RING_PATH = Path.Combine(Directory.GetCurrentDirectory(), "rest_begin.wav");
-        readonly static string CLASS_REST_OVER_RING_PATH = Path.Combine(Directory.GetCurrentDirectory(), "rest_over.wav");
 
         public static readonly List<Class> CLASSES = new()
         {
-            new Class(7, 10, 80),
-            new Class(8, 40, 80),
-            new Class(10, 10, 80),
-            new Class(13, 20, 80),
-            new Class(15, 10, 80),
-            new Class(18, 0, 80),
-            new Class(19, 30, 90, false),
+            new Class(7, 10, 60),
+            new Class(8, 20, 60),
+            new Class(9, 30, 60),
+            new Class(10, 40, 50, 120),
+            new Class(13, 30, 60),
+            new Class(14, 40, 60, 20),
+            new Class(16, 0, 40, 60),
+            new Class(16, 0, 40),
+            new Class(17, 40, 70),
+            new Class(19, 0, 80),
+            new Class(20, 30, 60, 9 * 60 + 40)
         };
 
         public int BeginHour { get; set; }
         public int BeginMinute { get; set; }
         public int TotalMinute { get; set; }
-        public int MinutesToRest { get; set; } = 35;
-        public int RestInterval { get; set; } = 10;
-        public bool Rest { get; set; }
-        public Class(int hour, int minute, int totalMinute, bool rest = true)
+        public int RestMinutes { get; set; }
+        public Class(int hour, int minute, int totalMinute, int restMinutes = 10)
         {
             BeginHour = hour;
             BeginMinute = minute;
             TotalMinute = totalMinute;
-            Rest = rest;
-            if (!rest)
-            {
-                MinutesToRest = 0;
-                RestInterval = 0;
-            } 
+            RestMinutes = restMinutes;
         }
 
         public IScheduler AddToScheduler(IScheduler scheduler)
@@ -52,27 +47,7 @@ namespace Wakaru
             var date = new DateTime(cur.Year, cur.Month, cur.Day, BeginHour, BeginMinute, 0);
             //上课
             {
-                var jobDetail = JobBuilder.Create<ClassBeginRingJob>().Build();
-                ITrigger trigger = TriggerBuilder.Create()
-                    .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(date.Hour, date.Minute))
-                    .Build();
-                scheduler.ScheduleJob(jobDetail, trigger);
-            }
-            //休息开始
-            if (Rest)
-            {
-                date = date.AddMinutes(MinutesToRest); 
-                var jobDetail = JobBuilder.Create<RestBeginRingJob>().Build();
-                ITrigger trigger = TriggerBuilder.Create()
-                    .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(date.Hour, date.Minute))
-                    .Build();
-                scheduler.ScheduleJob(jobDetail, trigger);
-            }
-            //休息结束
-            if (Rest)
-            {
-                date = date.AddMinutes(RestInterval);
-                var jobDetail = JobBuilder.Create<RestOverRingJob>().Build();
+                var jobDetail = JobBuilder.Create<ClassBeginRingJob>().UsingJobData("classMinutes", TotalMinute).Build();
                 ITrigger trigger = TriggerBuilder.Create()
                     .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(date.Hour, date.Minute))
                     .Build();
@@ -80,8 +55,8 @@ namespace Wakaru
             }
             //下课
             {
-                date = date.AddMinutes(TotalMinute - RestInterval - MinutesToRest);
-                var jobDetail = JobBuilder.Create<ClassOverRingJob>().Build();
+                date = date.AddMinutes(TotalMinute);
+                var jobDetail = JobBuilder.Create<ClassOverRingJob>().UsingJobData("restMinutes", RestMinutes).Build();
                 ITrigger trigger = TriggerBuilder.Create()
                     .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(date.Hour, date.Minute))
                     .Build();
@@ -96,9 +71,10 @@ namespace Wakaru
             {
                 return Task.Factory.StartNew(() =>
                 {
+                    int min = (int)context.MergedJobDataMap.Get("classMinutes");
                     MainWindow.ClearLog();
                     MainWindow.AddLog("上课: " + DateTime.Now.ToString());
-                    MainWindow.NextTime = DateTime.Now.AddMinutes(35);
+                    MainWindow.NextTime = DateTime.Now.AddMinutes(Convert.ToDouble(min));
                     MainWindow.ChangeStatus(Status.IN_CLASS);
                     new SoundPlayer(CLASS_BEGIN_RING_PATH).Play();
                 });
@@ -111,45 +87,11 @@ namespace Wakaru
             {
                 return Task.Factory.StartNew(() =>
                 {
-                    //非常Dirty的实现，凑合用
+                    int min = (int)context.MergedJobDataMap.Get("restMinutes");
                     MainWindow.AddLog("下课: " + DateTime.Now.ToString());
-                    //课间休息
-                    MainWindow.NextTime = DateTime.Now.AddMinutes(10);
-                    //中午休息
-                    if (DateTime.Now.Hour == 11) MainWindow.NextTime = DateTime.Now.AddMinutes(110);
-                    //下午大课间
-                    if (DateTime.Now.Hour == 14) MainWindow.NextTime = DateTime.Now.AddMinutes(30);
-                    //晚上休息
-                    if (DateTime.Now.Hour == 16) MainWindow.NextTime = DateTime.Now.AddMinutes(90);
+                    MainWindow.NextTime = DateTime.Now.AddMinutes(Convert.ToDouble(min));
                     MainWindow.ChangeStatus(Status.CLASS_OVER);
                     new SoundPlayer(CLASS_OVER_RING_PATH).Play();
-                });
-            }
-        }
-
-        private class RestBeginRingJob : IJob
-        {
-            public Task Execute(IJobExecutionContext context)
-            {
-                return Task.Factory.StartNew(() =>
-                {
-                    MainWindow.AddLog("课中休息开始: " + DateTime.Now.ToString());
-                    MainWindow.NextTime = DateTime.Now.AddMinutes(10);
-                    MainWindow.ChangeStatus(Status.RESTING);
-                    new SoundPlayer(CLASS_REST_BEGIN_RING_PATH).Play();
-                });
-            }
-        }
-        private class RestOverRingJob : IJob
-        {
-            public Task Execute(IJobExecutionContext context)
-            {
-                return Task.Factory.StartNew(() =>
-                {
-                    MainWindow.AddLog("课中休息结束: " + DateTime.Now.ToString());
-                    MainWindow.NextTime = DateTime.Now.AddMinutes(35);
-                    MainWindow.ChangeStatus(Status.AFTER_RESTING);
-                    new SoundPlayer(CLASS_REST_OVER_RING_PATH).Play();
                 });
             }
         }
