@@ -9,26 +9,60 @@ using System.Threading.Tasks;
 
 namespace Wakaru
 {
-    internal class Class
+    internal class Classes
     {
-        readonly static string CLASS_BEGIN_RING_PATH = Path.Combine(Directory.GetCurrentDirectory(), "begin.wav");
-        readonly static string CLASS_OVER_RING_PATH = Path.Combine(Directory.GetCurrentDirectory(), "over.wav");
-
-        public static readonly List<Class> CLASSES = new()
+        public static readonly List<Class> NORMAL = new()
+        {
+            new Class(7, 10, 40),
+            new Class(8, 0, 40),
+            new Class(8, 50, 40, 30),
+            new Class(10, 0, 40),
+            new Class(10, 50, 40, 120),
+            new Class(13, 30, 40),
+            new Class(14, 20, 40, 30),
+            new Class(15, 30, 80, 50),
+            new Class(17, 40, 70),
+            new Class(19, 0, 80),
+            new Class(20, 30, 60, 9 * 60 + 40),
+        };
+        public static readonly List<Class> SAT = new()
+        {
+            new Class(7, 30, 40),
+            new Class(8, 20, 40),
+            new Class(9, 10, 40),
+            new Class(10, 0, 40),
+            new Class(10, 50, 40, 120),
+            new Class(13, 30, 40),
+            new Class(14, 20, 40, 30),
+            new Class(15, 30, 80, 50),
+            new Class(17, 40, 70),
+            new Class(19, 0, 80),
+            new Class(20, 30, 60, 9 * 60 + 20),
+        };
+        public static readonly List<Class> SUN = new()
+        {
+            new Class(8, 0, 60, 20),
+            new Class(9, 20, 60, 20),
+            new Class(10, 40, 60, 19 * 60 + 30),
+        };
+        public static readonly List<Class> FULL = new()
         {
             new Class(7, 10, 60),
             new Class(8, 20, 60),
             new Class(9, 30, 60),
-            new Class(10, 40, 50, 120),
+            new Class(10, 40, 60, 110),
             new Class(13, 30, 60),
             new Class(14, 40, 60, 20),
             new Class(16, 0, 40, 60),
-            new Class(16, 0, 40),
             new Class(17, 40, 70),
             new Class(19, 0, 80),
             new Class(20, 30, 60, 9 * 60 + 40)
         };
-
+    }
+    public class Class
+    {
+        readonly static string CLASS_BEGIN_RING_PATH = Path.Combine(Directory.GetCurrentDirectory(), "begin.wav");
+        readonly static string CLASS_OVER_RING_PATH = Path.Combine(Directory.GetCurrentDirectory(), "over.wav");
         public int BeginHour { get; set; }
         public int BeginMinute { get; set; }
         public int TotalMinute { get; set; }
@@ -72,7 +106,6 @@ namespace Wakaru
                 return Task.Factory.StartNew(() =>
                 {
                     int min = (int)context.MergedJobDataMap.Get("classMinutes");
-                    MainWindow.ClearLog();
                     MainWindow.AddLog("上课: " + DateTime.Now.ToString());
                     MainWindow.NextTime = DateTime.Now.AddMinutes(Convert.ToDouble(min));
                     MainWindow.ChangeStatus(Status.IN_CLASS);

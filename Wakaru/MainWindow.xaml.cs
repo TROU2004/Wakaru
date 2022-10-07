@@ -1,6 +1,8 @@
-﻿using Quartz.Impl;
+﻿using Quartz;
+using Quartz.Impl;
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,14 +25,16 @@ namespace Wakaru
     public partial class MainWindow : Window
     {
         static MainWindow Instance;
-        public static DateTime NextTime;
+        private static DateTime nextTime;
+        private static IScheduler? scheduler;
+
+        public static DateTime NextTime { get => nextTime; set => nextTime = value; }
 
         public MainWindow()
         {
-            InitializeComponent();
             Instance = this;
             AddLog("Wakaru正在启动...");
-            LoadClasses();
+            InitializeComponent();
             ChangeStatus(Status.WAIT_FOR_CLASS);
             DispatcherTimer dispatcherTimer = new()
             {
@@ -51,15 +55,21 @@ namespace Wakaru
             });
             dispatcherTimer.Start();
         }
-        public async static void LoadClasses()
+
+        public async static void LoadClasses(List<Class> classes)
         {
-            var schedulerFactory = new StdSchedulerFactory();
-            var scheduler = await schedulerFactory.GetScheduler();
-            foreach (var item in Class.CLASSES)
+            if (scheduler == null)
+            {
+                var schedulerFactory = new StdSchedulerFactory();
+                scheduler = await schedulerFactory.GetScheduler();
+            }
+            ClearLog();
+            await scheduler.Clear();
+            foreach (var item in classes)
             {
                 scheduler = item.AddToScheduler(scheduler);
             }
-            AddLog("加载了" + Class.CLASSES.Count + "个课节, 时间: " + DateTime.Now.ToString());
+            AddLog("加载了" + classes.Count + "个课节, 时间: " + DateTime.Now.ToString());
             await scheduler.Start();
         }
 
@@ -117,6 +127,25 @@ namespace Wakaru
             if (status == Status.WAIT_FOR_CLASS) return "等待上课";
             if (status >= Status.WAIT_FOR_CLASS) return "上课";
             return "未知";
+        }
+
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int index = ListBoxSchedule.SelectedIndex;
+            List<Class> classes = Classes.NORMAL;
+            switch (index)
+            {
+                case 1:
+                    classes = Classes.SAT;
+                    break;
+                case 2:
+                    classes = Classes.SUN;
+                    break;
+                case 3:
+                    classes = Classes.FULL;
+                    break;
+            }
+            LoadClasses(classes);
         }
     }
 
