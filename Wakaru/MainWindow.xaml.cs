@@ -3,6 +3,7 @@ using Quartz.Impl;
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Path = System.IO.Path;
 
 namespace Wakaru
 {
@@ -24,17 +26,41 @@ namespace Wakaru
     /// </summary>
     public partial class MainWindow : Window
     {
-        static MainWindow Instance;
+        public static MainWindow Instance;
         private static DateTime nextTime;
         private static IScheduler? scheduler;
+        private static List<string> sounds = new();
+        public static readonly string SoundsPath = Path.Combine(Directory.GetCurrentDirectory(), "sounds");
+        private bool muted;
+
+        public bool Muted
+        {
+            get { return muted; }
+            set { 
+                muted = value;
+                Instance.Dispatcher.BeginInvoke(new Action(() => {
+                    ColorZoneMain.Background = muted ? new SolidColorBrush(Colors.IndianRed) : new SolidColorBrush(Colors.BlueViolet);
+                    ProgressBarMain.Background = muted ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.MediumPurple);
+                    ProgressBarMain.IsIndeterminate = !Muted;
+                    RunningStatusText.Text = muted ? "下一次打铃已跳过" : "Wakaru 正在运行";
+                }));
+            }
+        }
+
 
         public static DateTime NextTime { get => nextTime; set => nextTime = value; }
 
         public MainWindow()
         {
             Instance = this;
+            foreach (var item in Directory.GetFiles(SoundsPath, "*.wav"))
+            {
+                sounds.Add(Path.GetFileNameWithoutExtension(item));
+            }
             AddLog("Wakaru正在启动...");
             InitializeComponent();
+            ClassBeginBox.ItemsSource = sounds;
+            ClassOverBox.ItemsSource = sounds;
             ChangeStatus(Status.WAIT_FOR_CLASS);
             DispatcherTimer dispatcherTimer = new()
             {
@@ -146,6 +172,23 @@ namespace Wakaru
                     break;
             }
             LoadClasses(classes);
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            Muted = !Muted;
+        }
+
+        private void ClassBeginBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var index = ClassBeginBox.SelectedIndex;
+            Class.CLASS_BEGIN_RING_PATH = Path.Combine(SoundsPath, sounds[index] + ".wav");
+        }
+
+        private void ClassOverBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var index = ClassOverBox.SelectedIndex;
+            Class.CLASS_OVER_RING_PATH = Path.Combine(SoundsPath, sounds[index] + ".wav");
         }
     }
 

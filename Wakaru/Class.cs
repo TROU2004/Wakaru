@@ -32,10 +32,11 @@ namespace Wakaru
             new Class(9, 10, 40),
             new Class(10, 0, 40),
             new Class(10, 50, 40, 120),
-            new Class(13, 30, 40),
-            new Class(14, 20, 40, 30),
-            new Class(15, 30, 80, 50),
-            new Class(17, 40, 70),
+            new Class(13, 20, 40),
+            new Class(14, 10, 40, 30),
+            new Class(15, 20, 40),
+            new Class(16, 10, 40, 40),
+            new Class(17, 30, 80),
             new Class(19, 0, 80),
             new Class(20, 30, 60, 9 * 60 + 20),
         };
@@ -61,8 +62,8 @@ namespace Wakaru
     }
     public class Class
     {
-        readonly static string CLASS_BEGIN_RING_PATH = Path.Combine(Directory.GetCurrentDirectory(), "begin.wav");
-        readonly static string CLASS_OVER_RING_PATH = Path.Combine(Directory.GetCurrentDirectory(), "over.wav");
+        public static string CLASS_BEGIN_RING_PATH = Path.Combine(Directory.GetCurrentDirectory(), "dafault", "default_class_begin.wav");
+        public static string CLASS_OVER_RING_PATH = Path.Combine(Directory.GetCurrentDirectory(), "dafault", "default_class_over.wav");
         public int BeginHour { get; set; }
         public int BeginMinute { get; set; }
         public int TotalMinute { get; set; }
@@ -109,6 +110,11 @@ namespace Wakaru
                     MainWindow.AddLog("上课: " + DateTime.Now.ToString());
                     MainWindow.NextTime = DateTime.Now.AddMinutes(Convert.ToDouble(min));
                     MainWindow.ChangeStatus(Status.IN_CLASS);
+                    if (MainWindow.Instance.Muted) 
+                    {
+                        MainWindow.Instance.Muted = false;
+                        return;
+                    }
                     new SoundPlayer(CLASS_BEGIN_RING_PATH).Play();
                 });
             }
@@ -124,6 +130,11 @@ namespace Wakaru
                     MainWindow.AddLog("下课: " + DateTime.Now.ToString());
                     MainWindow.NextTime = DateTime.Now.AddMinutes(Convert.ToDouble(min));
                     MainWindow.ChangeStatus(Status.CLASS_OVER);
+                    if (MainWindow.Instance.Muted)
+                    {
+                        MainWindow.Instance.Muted = false;
+                        return;
+                    }
                     new SoundPlayer(CLASS_OVER_RING_PATH).Play();
                 });
             }
