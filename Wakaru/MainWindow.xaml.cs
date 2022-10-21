@@ -158,7 +158,7 @@ namespace Wakaru
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int index = ListBoxSchedule.SelectedIndex;
-            List<Class> classes = Classes.NORMAL;
+            List<Class> classes = Classes.SAT;
             switch (index)
             {
                 case 1:
@@ -167,9 +167,6 @@ namespace Wakaru
                 case 2:
                     classes = Classes.SUN;
                     break;
-                case 3:
-                    classes = Classes.FULL;
-                    break;
             }
             LoadClasses(classes);
         }
@@ -177,18 +174,6 @@ namespace Wakaru
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             Muted = !Muted;
-        }
-
-        private void ClassBeginBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var index = ClassBeginBox.SelectedIndex;
-            Class.CLASS_BEGIN_RING_PATH = Path.Combine(SoundsPath, sounds[index] + ".wav");
-        }
-
-        private void ClassOverBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var index = ClassOverBox.SelectedIndex;
-            Class.CLASS_OVER_RING_PATH = Path.Combine(SoundsPath, sounds[index] + ".wav");
         }
     }
 

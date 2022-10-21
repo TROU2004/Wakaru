@@ -12,7 +12,7 @@
                 <StackPanel Orientation="Horizontal">
                     <ToggleButton Style="{DynamicResource MaterialDesignHamburgerToggleButton}" />
                     <TextBlock FontSize="18" VerticalAlignment="Center" Margin="16 0 0 0">
-                    Wakaru v20221007 - 通化一中腾讯会议打铃系统
+                    Wakaru v20221021 - 通化一中腾讯会议打铃系统
                     </TextBlock>
                 </StackPanel>
                 <Button HorizontalAlignment="Right" Foreground="White" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click">
@@ -75,10 +75,10 @@
                             <DockPanel Grid.Row="1">
                                 <TextBlock FontSize="15" Margin="5" VerticalAlignment="Center">日程方案:</TextBlock>
                                 <ListBox x:Name="ListBoxSchedule" Style="{StaticResource MaterialDesignChoiceChipPrimaryListBox}" SelectionChanged="ListBox_SelectionChanged">
-                                    <ListBoxItem x:Name="Item_NORMAL" IsSelected="True" Content="Mon-Fri" />
-                                    <ListBoxItem x:Name="Item_SAT" Content="Sat" />
-                                    <ListBoxItem x:Name="Item_SUN" Content="Sun" />
-                                    <ListBoxItem x:Name="Item_FULL" Content="大课" />
+                                    <ListBoxItem x:Name="Item_NORMAL" Visibility="Collapsed" Content="Mon-Fri" />
+                                    <ListBoxItem x:Name="Item_SAT" IsSelected="True" Content="Sat-Special" />
+                                    <ListBoxItem x:Name="Item_SUN" Content="Sun-Special" />
+                                    <ListBoxItem x:Name="Item_FULL" Visibility="Collapsed" Content="大课" />
                                 </ListBox>
                             </DockPanel>
                         </Grid>
@@ -92,11 +92,11 @@
                             </Grid.RowDefinitions>
                             <StackPanel>
                                 <TextBlock>上课铃:</TextBlock>
-                                <ComboBox materialDesign:HintAssist.Hint="默认" Name="ClassBeginBox" Height="30" SelectionChanged="ClassBeginBox_SelectionChanged" />
+                                <ComboBox materialDesign:HintAssist.Hint="Specials" IsEnabled="False" Name="ClassBeginBox" Height="30" />
                             </StackPanel>
                             <StackPanel Grid.Row="1">
                                 <TextBlock>下课铃:</TextBlock>
-                                <ComboBox materialDesign:HintAssist.Hint="默认" Name="ClassOverBox" Height="30" SelectionChanged="ClassOverBox_SelectionChanged" />
+                                <ComboBox materialDesign:HintAssist.Hint="Specials" IsEnabled="False" Name="ClassOverBox" Height="30" />
                             </StackPanel>
                             <Button Grid.Row="2" Click="Button_Click_1">临时静音</Button>
                         </Grid>
