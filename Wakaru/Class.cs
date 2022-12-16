@@ -53,7 +53,7 @@ namespace Wakaru
             new Class(10, 40, 60, 110),
             new Class(13, 30, 60),
             new Class(14, 40, 60, 20),
-            new Class(16, 0, 40, 60),
+            new Class(16, 0, 50, 60),
             new Class(17, 40, 70),
             new Class(19, 0, 80),
             new Class(20, 30, 60, 9 * 60 + 40)
