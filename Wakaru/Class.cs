@@ -13,7 +13,7 @@ namespace Wakaru
     {
         public static readonly List<Class> NORMAL = new()
         { 
-            new Class(6, 50, 20),
+            new Class(6, 50, 0),
             new Class(7, 10, 40),
             new Class(8, 0, 40),
             new Class(8, 50, 40, 30),
@@ -28,7 +28,7 @@ namespace Wakaru
         };
         public static readonly List<Class> SAT = new()
         {
-            new Class(7, 10, 20),
+            new Class(7, 10, 0),
             new Class(7, 30, 40),
             new Class(8, 20, 40),
             new Class(9, 10, 40),
@@ -91,6 +91,11 @@ namespace Wakaru
             }
             //下课
             {
+                //Single ring
+                if  (TotalMinute == 0)
+                {
+                    return scheduler;
+                }
                 date = date.AddMinutes(TotalMinute);
                 var jobDetail = JobBuilder.Create<ClassOverRingJob>().UsingJobData("restMinutes", RestMinutes).Build();
                 ITrigger trigger = TriggerBuilder.Create()
