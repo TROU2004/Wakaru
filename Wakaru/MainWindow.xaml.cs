@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -189,6 +190,19 @@ namespace Wakaru
         {
             var index = ClassOverBox.SelectedIndex;
             Class.CLASS_OVER_RING_PATH = Path.Combine(SoundsPath, sounds[index] + ".wav");
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            MainWindow.AddLog("上课: " + DateTime.Now.ToString());
+            MainWindow.NextTime = DateTime.Now.AddMinutes(Convert.ToDouble(40));
+            MainWindow.ChangeStatus(Status.IN_CLASS);
+            if (MainWindow.Instance.Muted)
+            {
+                MainWindow.Instance.Muted = false;
+                return;
+            }
+            new SoundPlayer(Class.CLASS_BEGIN_RING_PATH).Play();
         }
     }
 

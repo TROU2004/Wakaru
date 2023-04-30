@@ -43,9 +43,9 @@ namespace Wakaru
         };
         public static readonly List<Class> SUN = new()
         {
-            new Class(8, 0, 60, 20),
-            new Class(9, 20, 60, 20),
-            new Class(10, 40, 60, 19 * 60 + 30),
+            new Class(8, 0, 60, 15),
+            new Class(9, 15, 60, 15),
+            new Class(10, 30, 60, 19 * 60 + 30),
         };
         public static readonly List<Class> FULL = new()
         {
@@ -106,7 +106,7 @@ namespace Wakaru
             return scheduler;
         }
 
-        private class ClassBeginRingJob : IJob
+        public class ClassBeginRingJob : IJob
         {
             public Task Execute(IJobExecutionContext context)
             {
@@ -126,7 +126,7 @@ namespace Wakaru
             }
         }
 
-        private class ClassOverRingJob : IJob
+        public class ClassOverRingJob : IJob
         {
             public Task Execute(IJobExecutionContext context)
             {
